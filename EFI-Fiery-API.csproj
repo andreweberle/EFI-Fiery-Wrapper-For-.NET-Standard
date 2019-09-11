@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>EFI_Fiery_API</RootNamespace>
+    <StartupObject>myApplicationName.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="EbbsSoft">
+      <HintPath>..\..\GitHub\.NET_Family-ExtensionHelper\bin\Debug\netstandard2.0\EbbsSoft.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
