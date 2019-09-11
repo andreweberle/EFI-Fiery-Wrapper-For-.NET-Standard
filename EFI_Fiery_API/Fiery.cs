@@ -10,6 +10,13 @@ namespace EFI
 {
     public partial class Fiery
     {
+        private Fiery()
+        {
+        }
+
+        /// <summary>
+        /// Media Type For Rest Requests.
+        /// </summary>
         private const string MEDIA_TYPE = "application/json";
 
         /// <summary>
@@ -27,12 +34,6 @@ namespace EFI
         /// </summary>
         /// <value></value>
         public static string AccessKey { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <value></value>
-        private static string SessionID { get; set; }
 
         /// <summary>
         /// 
@@ -101,7 +102,7 @@ namespace EFI
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static bool Login(Printer printer, string username, string password)
+        public static EFI_Fiery_API.FieryLogin.Login Login(Printer printer, string username, string password)
         {
             // Apply Certificate.
             Console.Write("{0}", IsCertificateValidationApplied.Value ? "Certificate Applied" : "Certificate Was Unable To Be Applied");
@@ -118,15 +119,7 @@ namespace EFI
 
             EFI_Fiery_API.FieryLogin.Login loginResponse = SendLoginRequest(printer, username, password).Result;
 
-            if (loginResponse.IsSuccess)
-            {
-                SessionID = loginResponse.SessionID;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return loginResponse;
         }
 
         /// <summary>
@@ -137,7 +130,6 @@ namespace EFI
         public static bool Logout(Printer printer)
         {
             bool isLoggedOut = false;
-
             Task task = Task.Run(async () =>
             {
                 string url = $"https://{printer.IPAddress}/live/api/v4/logout";
@@ -147,7 +139,7 @@ namespace EFI
                     HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
                     if (httpResponseMessage.IsSuccessStatusCode)
                     {
-                        SessionID = null;
+                        SessionIDCookie = null;
                     }
 
                     isLoggedOut = httpResponseMessage.IsSuccessStatusCode;
@@ -247,7 +239,6 @@ namespace EFI
         public static EFI_Fiery_API.FieryJobs.PrinterJobs PrinterJobs(Printer printer, EFI_Fiery_API.FieryJobs.JobState jobState) =>
             SendGetRequest<EFI_Fiery_API.FieryJobs.PrinterJobs>(printer, $"https://{printer.IPAddress}/live/api/v4/jobs/{jobState.ToString()}");
 
-
         /// <summary>
         /// Send GET Request.
         /// </summary>
@@ -282,8 +273,9 @@ namespace EFI
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
+        /// <param name="printer"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
         /// <returns></returns>
         private static async Task<EFI_Fiery_API.FieryLogin.Login> SendLoginRequest(Printer printer, string username, string password)
         {
@@ -303,9 +295,7 @@ namespace EFI
 
                         if (httpResponseMessage.IsSuccessStatusCode)
                         {
-                            SessionID = GetSessionID(httpResponseMessage);
-                            SessionIDCookie = new Cookie("_session_id", SessionID, "/", printer.IPAddress);
-                            loginResponse.SessionID = SessionID;
+                            SessionIDCookie = new Cookie("_session_id", GetSessionID(httpResponseMessage), "/", printer.IPAddress);
                             loginResponse.IsSuccess = true;
                         }
                         else
@@ -325,7 +315,7 @@ namespace EFI
                         }
                     };
 
-                    loginResponse.Error = new EFI_Fiery_API.FieryLogin.LoginError(); 
+                    loginResponse.Error.Errors = new System.Collections.Generic.List<EFI_Fiery_API.FieryLogin.ErrorElement>();
 
                     foreach (var error in ex.TryGetInnerExceptionsErrors().Select(x => x.Message))
                     {
