@@ -17,14 +17,17 @@ namespace EFI_Fiery_API
 
         public class Item
         {
+            [JsonConverter(typeof(FieryHelpers.KbToGbConverter))]
             [JsonProperty("disk_available")]
-            public long DiskAvailable { get; set; }
+            public string DiskAvailable { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.KbToGbConverter))]
             [JsonProperty("disk_total")]
-            public long DiskTotal { get; set; }
+            public string DiskTotal { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("epoch_time")]
-            public long EpochTime { get; set; }
+            public DateTime EpochTime { get; set; }
 
             [JsonProperty("fiery_locale")]
             public string FieryLocale { get; set; }
@@ -32,11 +35,13 @@ namespace EFI_Fiery_API
             [JsonProperty("locale")]
             public string Locale { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.KbToGbConverter))]
             [JsonProperty("memory_available")]
-            public long MemoryAvailable { get; set; }
+            public string MemoryAvailable { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.KbToGbConverter))]
             [JsonProperty("memory_total")]
-            public long MemoryTotal { get; set; }
+            public string MemoryTotal { get; set; }
 
             [JsonProperty("name")]
             public string Name { get; set; }
@@ -50,8 +55,9 @@ namespace EFI_Fiery_API
             [JsonProperty("timezone")]
             public string Timezone { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.MinuteToDayConverter))]
             [JsonProperty("uptime")]
-            public long Uptime { get; set; }
+            public string Uptime { get; set; }
 
             [JsonProperty("version")]
             public string Version { get; set; }

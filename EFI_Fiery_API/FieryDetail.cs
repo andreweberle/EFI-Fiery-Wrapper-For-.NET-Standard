@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace EFI_Fiery_API
 {
-    public class FieryDetail
+    public class FieryPrinterDetail
     {
         public class PrinterDetail
         {
@@ -41,14 +41,17 @@ namespace EFI_Fiery_API
             [JsonProperty("default_paper_size")]
             public string DefaultPaperSize { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.KbToGbConverter))]
             [JsonProperty("disk_available")]
-            public long DiskAvailable { get; set; }
+            public string DiskAvailable { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.KbToGbConverter))]
             [JsonProperty("disk_total")]
-            public long DiskTotal { get; set; }
+            public string DiskTotal { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("epoch_time")]
-            public long EpochTime { get; set; }
+            public DateTime EpochTime { get; set; }
 
             [JsonProperty("fiery_locale")]
             public string FieryLocale { get; set; }
@@ -62,11 +65,13 @@ namespace EFI_Fiery_API
             [JsonProperty("measurement_unit")]
             public string MeasurementUnit { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.KbToGbConverter))]
             [JsonProperty("memory_available")]
-            public long MemoryAvailable { get; set; }
+            public string MemoryAvailable { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.KbToGbConverter))]
             [JsonProperty("memory_total")]
-            public long MemoryTotal { get; set; }
+            public string MemoryTotal { get; set; }
 
             [JsonProperty("name")]
             public string Name { get; set; }
@@ -95,8 +100,9 @@ namespace EFI_Fiery_API
             [JsonProperty("timezones")]
             public List<Timezone> Timezones { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.MinuteToDayConverter))]
             [JsonProperty("uptime")]
-            public long Uptime { get; set; }
+            public string Uptime { get; set; }
 
             [JsonProperty("version")]
             public string Version { get; set; }

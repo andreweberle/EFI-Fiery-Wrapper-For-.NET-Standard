@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 
@@ -19,6 +18,13 @@ namespace EFI_Fiery_API
             Printing,
             Processing,
             Archived
+        }
+
+        public enum PreviewState
+        {
+            Thumb,
+            Screen,
+            Full
         }
 
         public partial class PrinterJobs
@@ -74,8 +80,9 @@ namespace EFI_Fiery_API
             [JsonProperty("print status")]
             public string PrintStatus { get; set; }
 
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("date")]
-            public DateTimeOffset Date { get; set; } 
+            public DateTime Date { get; set; } 
 
             [JsonProperty("num pages")]
             public string NumberofPages { get; set; }
@@ -140,7 +147,7 @@ namespace EFI_Fiery_API
             [JsonProperty("held?")]
             public string IsHeld { get; set; }
 
-            [JsonProperty("has disk raster")]
+            [JsonProperty("has disk raster?")]
             public string HasDiskRaster { get; set; }
 
             [JsonProperty("Notes1")]
@@ -157,7 +164,8 @@ namespace EFI_Fiery_API
 
             public string EFDuplex { get; set; }
 
-            public DateTimeOffset EFIPrintTime { get; set; }
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
+            public DateTime EFIPrintTime { get; set; }
 
             public string Instruct { get; set; }
             public string EFRaster { get; set; }
@@ -194,142 +202,158 @@ namespace EFI_Fiery_API
             public string EFMediaType { get; set; }
             public string EFMediaWeight { get; set; }
             public string EFOutputBin { get; set; }
+
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             public bool EFPadPrinting { get; set; }
+
+
             public string EFPageDelivery { get; set; }
+
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             public bool EFPCPadCover { get; set; }
+
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             public bool EFPostFlight { get; set; }
-            public bool EFPrintCover { get; set; }
+
+            public string EFPrintCover { get; set; }
+
             public string EFPrintSize { get; set; }
             public long EFSheetsInPad { get; set; }
+
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             public bool EFSlipsheet { get; set; }
+
             public long EFSlipSheetFreq { get; set; }
             public string EFSort { get; set; }
+
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             public bool EFUseAPPE { get; set; }
+
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             public bool EFUserRotate180 { get; set; }
+
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             public bool EFUseSPDMediaMapping { get; set; }
+
             public string PageSize { get; set; }
             public long EFPCMID { get; set; }
             public string EFPCName { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp created")]
-            public DateTimeOffset TimestampCreated { get; set; }
+            public DateTime TimestampCreated { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp done printing")]
-            public DateTimeOffset TimestampDonePrinting { get; set; }
+            public DateTime TimestampDonePrinting { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp done ripping")]
-            public DateTimeOffset TimestampDoneRipping { get; set; }
+            public DateTime TimestampDoneRipping { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp done spooling")]
-            public DateTimeOffset TimestampDoneSpooling { get; set; }
+            public DateTime TimestampDoneSpooling { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 0")]
-            public DateTimeOffset TimestampDQProgress0 { get; set; }
+            public DateTime TimestampDQProgress0 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 1")]
-            public DateTimeOffset TimestampDQProgress1 { get; set; }
+            public DateTime TimestampDQProgress1 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 10")]
-            public DateTimeOffset TimestampDQProgress10 { get; set; }
+            public DateTime TimestampDQProgress10 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 2")]
-            public DateTimeOffset TimestampDQProgress2 { get; set; }
+            public DateTime TimestampDQProgress2 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 3")]
-            public DateTimeOffset TimestampDQProgress3 { get; set; }
+            public DateTime TimestampDQProgress3 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 4")]
-            public DateTimeOffset TimestampDQProgress4 { get; set; }
+            public DateTime TimestampDQProgress4 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 5")]
-            public DateTimeOffset TimestampDQProgress5 { get; set; }
+            public DateTime TimestampDQProgress5 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 6")]
-            public DateTimeOffset TimestampDQProgress6 { get; set; }
+            public DateTime TimestampDQProgress6 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 7")]
-            public DateTimeOffset TimestampDQProgress7 { get; set; }
+            public DateTime TimestampDQProgress7 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 8")]
-            public DateTimeOffset TimestampDQProgress8 { get; set; }
+            public DateTime TimestampDQProgress8 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 9")]
-            public DateTimeOffset TimestampDQProgress9 { get; set; }
+            public DateTime TimestampDQProgress9 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 97")]
-            public DateTimeOffset TimestampDQProgress97 { get; set; }
+            public DateTime TimestampDQProgress97 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp dq progress 98")]
-            public DateTimeOffset TimestampDQProgress98 { get; set; }
+            public DateTime TimestampDQProgress98 { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp final LOG event")]
-            public DateTimeOffset TimestampFinalLogEvent { get; set; }
+            public DateTime TimestampFinalLogEvent { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp final video page event")]
-            public DateTimeOffset TimestampFinalVideoPageEvent { get; set; }
+            public DateTime TimestampFinalVideoPageEvent { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp first data")]
-            public DateTimeOffset TimestampFirstData { get; set; }
+            public DateTime TimestampFirstData { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp joblog")]
-            public DateTimeOffset TimestampJobLog { get; set; }
+            public DateTime TimestampJobLog { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp first page printed")]
-            public DateTimeOffset TimestampFirstPagePrinted { get; set; }
+            public DateTime TimestampFirstPagePrinted { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp last page ripped")]
-            public DateTimeOffset TimestampLagePageRipped { get; set; }
+            public DateTime TimestampLagePageRipped { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
-            [JsonProperty("timestamp first page printed")]
-            public DateTimeOffset TeimstampFirstPagePrinted { get; set; }
-
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp printing")]
-            public DateTimeOffset TimestampPrinting { get; set; }
+            public DateTime TimestampPrinting { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp ripping")]
-            public DateTimeOffset TimestampRipping { get; set; }
+            public DateTime TimestampRipping { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp spooling")]
-            public DateTimeOffset TimestampSpooling { get; set; }
+            public DateTime TimestampSpooling { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp touched")]
-            public DateTimeOffset TimestampTouched { get; set; }
+            public DateTime TimestampTouched { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp waiting to print")]
-            public DateTimeOffset TimestampWaitingToPrint { get; set; }
+            public DateTime TimestampWaitingToPrint { get; set; }
 
-            [JsonConverter(typeof(UnixDateTimeConverter))]
+            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp waiting to rip")]
-            public DateTimeOffset TimestampWaitingToRip { get; set; }
+            public DateTime TimestampWaitingToRip { get; set; }
 
             [JsonProperty("EFColorant1_RangeType")]
             public string EFColourAnt1RangeType { get; set; }
@@ -337,10 +361,11 @@ namespace EFI_Fiery_API
             [JsonProperty("EFColorant1_RangeValue")]
             public string EFColourAnt1RangeValue { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             [JsonProperty("EFImageWiseRange")]
             public bool EFImageWiseRange { get; set; }
 
-            [JsonProperty("EFIImageWise_RangeType")]
+            [JsonProperty("EFImageWise_RangeType")]
             public string EFImageWiseRangeType { get; set; }
 
             [JsonProperty("EFImageWise_RangeValue")]

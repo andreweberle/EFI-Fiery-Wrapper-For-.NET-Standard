@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using EbbsSoft.ExtensionHelpers.T_Helpers;
 using System.Net;
+using EbbsSoft.ExtensionHelpers.DoubleHelpers;
+using EbbsSoft.ExtensionHelpers.DateTimeHelpers;
 
 namespace EFI
 {
@@ -170,8 +172,8 @@ namespace EFI
         /// </summary>
         /// <param name="printer"></param>
         /// <returns></returns>
-        public static EFI_Fiery_API.FieryDetail.PrinterDetail PrinterDetail(Printer printer) => 
-            SendGetRequest<EFI_Fiery_API.FieryDetail.PrinterDetail>(printer, $"https://{printer.IPAddress}/live/api/v4/info/detail");
+        public static EFI_Fiery_API.FieryPrinterDetail.PrinterDetail PrinterDetail(Printer printer) => 
+            SendGetRequest<EFI_Fiery_API.FieryPrinterDetail.PrinterDetail>(printer, $"https://{printer.IPAddress}/live/api/v4/info/detail");
 
         /// <summary>
         /// Reports information about the supply of paper, tray, and toner on the print engine.
@@ -240,6 +242,52 @@ namespace EFI
             SendGetRequest<EFI_Fiery_API.FieryJobs.PrinterJobs>(printer, $"https://{printer.IPAddress}/live/api/v4/jobs/{jobState.ToString()}");
 
         /// <summary>
+        /// Retrieve preview of the job
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryPrinterJobPreview PrinterJobsPreview(Printer printer, string jobId, int pageNumber) =>
+            SendGetRequest<EFI_Fiery_API.FieryPrinterJobPreview>(printer, $"https://{printer.IPAddress}/live/api/v4/jobs/{jobId}/preview/{pageNumber}");
+
+        /// <summary>
+        /// Retrieve preview of the job
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="jobId"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="previewState"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryPrinterJobPreview PrinterJobsPreview(Printer printer, string jobId, int pageNumber, EFI_Fiery_API.FieryJobs.PreviewState previewState) =>
+            SendGetRequest<EFI_Fiery_API.FieryPrinterJobPreview>(printer, $"https://{printer.IPAddress}/live/api/v4/jobs/{jobId}/preview/{pageNumber}?page={previewState.ToString()}");
+
+        /// <summary>
+        /// Lists data from the Fiery's job log, containing selected accounting information for each printed job.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="count">100</param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting FieryPrinterAccounting(Printer printer, int count = 100) =>
+            SendGetRequest<EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting>(printer, $"https://{printer.IPAddress}/live/api/v4/accounting?count={count}");
+
+        /// <summary>
+        /// Lists data from the Fiery's job log, containing selected accounting information for each printed job.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="startTime">time range relative to present time.</param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting FieryPrinterAccounting(Printer printer, DateTime startTime)
+        {
+            long startTimeValue = -3600;
+            DateTime now = DateTime.Now.Date;
+            double numberofDays = (now - startTime).TotalDays;
+
+            startTimeValue = Convert.ToInt64((numberofDays * 1440) * -3600);
+            return SendGetRequest<EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting>(printer, $"https://{printer.IPAddress}/live/api/v4/accounting?start_time={startTimeValue}");
+        }
+            
+
+        /// <summary>
         /// Send GET Request.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -250,6 +298,7 @@ namespace EFI
         private static T SendGetRequest<T>(Printer printer, string url) where T : class
         {
             T response = Activator.CreateInstance<T>();
+
             Task task = Task.Run(async () =>
             {
                 using (HttpClientHandler httpClientHandler = new HttpClientHandler())
@@ -261,12 +310,24 @@ namespace EFI
                     httpClientHandler.CookieContainer = cookieContainer;
 
                     HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-                    string data = await httpResponseMessage.Content.ReadAsStringAsync();
-                    response = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(data);
+
+                    if (response.GetType() != typeof(EFI_Fiery_API.FieryPrinterJobPreview))
+                    {
+                        string data = await httpResponseMessage.Content.ReadAsStringAsync();
+                        response = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(data);
+                    }
+                    else
+                    {
+                        byte[] bytes = await httpResponseMessage.Content.ReadAsByteArrayAsync();
+ 
+                        response = (T)Convert.ChangeType(new EFI_Fiery_API.FieryPrinterJobPreview()
+                        {
+                            PreviewBytes = bytes
+                        }, typeof(EFI_Fiery_API.FieryPrinterJobPreview));
+                    }
                 }
             });
             Task.WaitAll(task);
-
             return response;
         }
 
@@ -314,9 +375,7 @@ namespace EFI
                             Message = ex.Message
                         }
                     };
-
                     loginResponse.Error.Errors = new System.Collections.Generic.List<EFI_Fiery_API.FieryLogin.ErrorElement>();
-
                     foreach (var error in ex.TryGetInnerExceptionsErrors().Select(x => x.Message))
                     {
                         loginResponse.Error.Errors.Add(new EFI_Fiery_API.FieryLogin.ErrorElement()
