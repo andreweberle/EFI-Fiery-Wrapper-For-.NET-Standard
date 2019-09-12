@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using EbbsSoft.ExtensionHelpers.T_Helpers;
 using System.Net;
-using EbbsSoft.ExtensionHelpers.DoubleHelpers;
-using EbbsSoft.ExtensionHelpers.DateTimeHelpers;
 
 namespace EFI
 {
@@ -267,7 +265,7 @@ namespace EFI
         /// <param name="printer"></param>
         /// <param name="count">100</param>
         /// <returns></returns>
-        public static EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting FieryPrinterAccounting(Printer printer, int count = 100) =>
+        public static EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting PrinterAccounting(Printer printer, int count = 100) =>
             SendGetRequest<EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting>(printer, $"https://{printer.IPAddress}/live/api/v4/accounting?count={count}");
 
         /// <summary>
@@ -276,16 +274,32 @@ namespace EFI
         /// <param name="printer"></param>
         /// <param name="startTime">time range relative to present time.</param>
         /// <returns></returns>
-        public static EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting FieryPrinterAccounting(Printer printer, DateTime startTime)
+        public static EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting PrinterAccounting(Printer printer, DateTime startTime)
         {
             long startTimeValue = -3600;
             DateTime now = DateTime.Now.Date;
             double numberofDays = (now - startTime).TotalDays;
-
             startTimeValue = Convert.ToInt64((numberofDays * 1440) * -3600);
             return SendGetRequest<EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting>(printer, $"https://{printer.IPAddress}/live/api/v4/accounting?start_time={startTimeValue}");
         }
-            
+
+        /// <summary>
+        /// Lists presets and their attributes
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryPrinterPresets.PrinterPresets PrinterPresets(Printer printer) => 
+            SendGetRequest<EFI_Fiery_API.FieryPrinterPresets.PrinterPresets>(printer, $"https://{printer.IPAddress}/live/api/v4/presets");
+
+        /// <summary>
+        /// Lists presets and their attributes
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="id">preset's id.</param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryPrinterPresets.PrinterPresets PrinterPresets(Printer printer, string id) =>
+            SendGetRequest<EFI_Fiery_API.FieryPrinterPresets.PrinterPresets>(printer, $"https://{printer.IPAddress}/live/api/v4/presets/{id}");
+
 
         /// <summary>
         /// Send GET Request.
@@ -293,7 +307,6 @@ namespace EFI
         /// <typeparam name="T"></typeparam>
         /// <param name="printer"></param>
         /// <param name="url"></param>
-        /// <param name="obj"></param>
         /// <returns></returns>
         private static T SendGetRequest<T>(Printer printer, string url) where T : class
         {
@@ -314,7 +327,7 @@ namespace EFI
                     if (response.GetType() != typeof(EFI_Fiery_API.FieryPrinterJobPreview))
                     {
                         string data = await httpResponseMessage.Content.ReadAsStringAsync();
-                        response = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(data);
+                        response = JsonConvert.DeserializeObject<T>(data);
                     }
                     else
                     {

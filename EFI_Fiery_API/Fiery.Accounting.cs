@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace EFI_Fiery_API
 {
@@ -16,7 +15,7 @@ namespace EFI_Fiery_API
             public Data Data { get; set; }
         }
 
-        public partial class Data
+        public class Data
         {
             [JsonProperty("totalItems")]
             public long TotalItems { get; set; }
@@ -31,7 +30,7 @@ namespace EFI_Fiery_API
             public List<Link> Links { get; set; }
         }
 
-        public partial class Item
+        public class Item
         {
             [JsonProperty("id")]
             public long Id { get; set; }
@@ -216,7 +215,7 @@ namespace EFI_Fiery_API
             public DateTime TimestampTouched { get; set; }
         }
 
-        public partial class Link
+        public class Link
         {
             [JsonProperty("rel")]
             public string Rel { get; set; }
