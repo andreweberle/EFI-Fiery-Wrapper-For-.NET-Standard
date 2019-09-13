@@ -27,7 +27,7 @@ namespace EFI_Fiery_API
             Full
         }
 
-        public partial class PrinterJobs
+        public class PrinterJobs
         {
             [JsonProperty("time")]
             public DateTimeOffset Time { get; set; }
@@ -36,7 +36,7 @@ namespace EFI_Fiery_API
             public Data Data { get; set; }
         }
 
-        public partial class Data
+        public class Data
         {
             [JsonProperty("totalItems")]
             public long TotalItems { get; set; }
@@ -47,11 +47,23 @@ namespace EFI_Fiery_API
             [JsonProperty("items")]
             public List<Item> Items { get; set; }
 
+            [JsonProperty("item")]
+            private Item Item
+            {
+                set
+                {
+                    Items = new List<Item>()
+                    {
+                        value
+                    };
+                }
+            }
+
             [JsonProperty("_links")]
             public List<Link> Links { get; set; }
         }
 
-        public partial class Link
+        public class Link
         {
             [JsonProperty("rel")]
             public string Rel { get; set; }
@@ -80,7 +92,7 @@ namespace EFI_Fiery_API
             [JsonProperty("print status")]
             public string PrintStatus { get; set; }
 
-            [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
+            [JsonConverter(typeof(FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("date")]
             public DateTime Date { get; set; } 
 

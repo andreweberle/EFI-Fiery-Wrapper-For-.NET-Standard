@@ -6,6 +6,13 @@ namespace EFI_Fiery_API
 {
     public class FieryPrinterAccounting
     {
+        public enum DateTimePoint
+        {
+            None,
+            Start_Time,
+            End_Time
+        }
+
         public class PrinterJobAccounting
         {
             [JsonProperty("time")]
@@ -53,9 +60,24 @@ namespace EFI_Fiery_API
             [JsonProperty("num pages")]
             public long NumPages { get; set; }
 
-            [JsonConverter(typeof(FieryHelpers.KbToMbConverter))]
             [JsonProperty("size")]
+            [JsonConverter(typeof(FieryHelpers.KbToMbConverter))]
             public string Size { get; set; }
+
+            [JsonProperty("media type", NullValueHandling = NullValueHandling.Ignore)]
+            public string MediaType { get; set; }
+
+            [JsonProperty("media size", NullValueHandling = NullValueHandling.Ignore)]
+            public string MediaSize { get; set; }
+
+            [JsonProperty("media weight", NullValueHandling = NullValueHandling.Ignore)]
+            public string MediaWeight { get; set; }
+
+            [JsonProperty("input slot", NullValueHandling = NullValueHandling.Ignore)]
+            public string InputSlot { get; set; }
+
+            [JsonProperty("media counters", NullValueHandling = NullValueHandling.Ignore)]
+            public List<MediaCounter> MediaCounters { get; set; }
 
             [JsonProperty("total pages printed")]
             public long TotalPagesPrinted { get; set; }
@@ -213,6 +235,45 @@ namespace EFI_Fiery_API
             [JsonConverter(typeof(FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("timestamp touched", NullValueHandling = NullValueHandling.Ignore)]
             public DateTime TimestampTouched { get; set; }
+        }
+
+        public class MediaCounter
+        {
+            [JsonProperty("media")]
+            public Media Media { get; set; }
+
+            [JsonProperty("total blank pages printed")]
+            public long TotalBlankPagesPrinted { get; set; }
+
+            [JsonProperty("total bw pages printed")]
+            public long TotalBwPagesPrinted { get; set; }
+
+            [JsonProperty("total color pages printed")]
+            public long TotalColorPagesPrinted { get; set; }
+
+            [JsonProperty("total pages printed")]
+            public long TotalPagesPrinted { get; set; }
+
+            [JsonProperty("total sheets printed")]
+            public long TotalSheetsPrinted { get; set; }
+        }
+
+        public class Media
+        {
+            [JsonProperty("input slot")]
+            public string InputSlot { get; set; }
+
+            [JsonProperty("media size")]
+            public string MediaSize { get; set; }
+
+            [JsonProperty("media type")]
+            public string MediaType { get; set; }
+
+            [JsonProperty("media weight")]
+            public string MediaWeight { get; set; }
+
+            [JsonProperty("product id")]
+            public string ProductId { get; set; }
         }
 
         public class Link

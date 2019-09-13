@@ -4,15 +4,15 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using EbbsSoft.ExtensionHelpers.T_Helpers;
+using EbbsSoft.ExtensionHelpers.DateTimeHelpers;
 using System.Net;
 
 namespace EFI
 {
     public partial class Fiery
     {
-        private Fiery()
-        {
-        }
+
+        private Fiery(){}
 
         /// <summary>
         /// Media Type For Rest Requests.
@@ -272,16 +272,21 @@ namespace EFI
         /// Lists data from the Fiery's job log, containing selected accounting information for each printed job.
         /// </summary>
         /// <param name="printer"></param>
-        /// <param name="startTime">time range relative to present time.</param>
+        /// <param name="dateTimePoint">start_time, end_time</param>
+        /// <param name="dateTime">time range relative to present time.</param>
+        /// <returns>100 Items</returns>
+        [Obsolete("Warning: May Cause The Printer To Crash If The DateTime Is Too Far Back.")]
+        public static EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting PrinterAccounting(Printer printer, EFI_Fiery_API.FieryPrinterAccounting.DateTimePoint dateTimePoint, DateTime dateTime) => 
+            SendGetRequest<EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting>(printer, $"https://{printer.IPAddress}/live/api/v4/accounting?{dateTimePoint.ToString().ToLower()}=-{dateTime.DateTimeToUnix()}");
+
+        /// <summary>
+        /// Lists data from the Fiery's job log, containing selected accounting information for each printed job.
+        /// Last 60 Minutes.
+        /// </summary>
+        /// <param name="printer"></param>
         /// <returns></returns>
-        public static EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting PrinterAccounting(Printer printer, DateTime startTime)
-        {
-            long startTimeValue = -3600;
-            DateTime now = DateTime.Now.Date;
-            double numberofDays = (now - startTime).TotalDays;
-            startTimeValue = Convert.ToInt64((numberofDays * 1440) * -3600);
-            return SendGetRequest<EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting>(printer, $"https://{printer.IPAddress}/live/api/v4/accounting?start_time={startTimeValue}");
-        }
+        public static EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting PrinterAccounting(Printer printer) =>
+            SendGetRequest<EFI_Fiery_API.FieryPrinterAccounting.PrinterJobAccounting>(printer, $"https://{printer.IPAddress}/live/api/v4/accounting?{EFI_Fiery_API.FieryPrinterAccounting.DateTimePoint.Start_Time.ToString().ToLower()}=-3600");
 
         /// <summary>
         /// Lists presets and their attributes
@@ -299,6 +304,32 @@ namespace EFI
         /// <returns></returns>
         public static EFI_Fiery_API.FieryPrinterPresets.PrinterPresets PrinterPresets(Printer printer, string id) =>
             SendGetRequest<EFI_Fiery_API.FieryPrinterPresets.PrinterPresets>(printer, $"https://{printer.IPAddress}/live/api/v4/presets/{id}");
+
+        /// <summary>
+        /// List of all the ppd, pdd, netcfg, dict.ppd, email.pdd keys, values.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="id">preset's id.</param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryPrinterProperties.PrinterProperties PrinterProperties(Printer printer) =>
+            SendGetRequest<EFI_Fiery_API.FieryPrinterProperties.PrinterProperties>(printer, $"https://{printer.IPAddress}/live/api/v4/properties");
+
+        /// <summary>
+        /// Retrieve a list of papercatalogs on the Fiery.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryPrinterCatalog.PrinterCatalog PrinterCatalog(Printer printer) =>
+            SendGetRequest<EFI_Fiery_API.FieryPrinterCatalog.PrinterCatalog>(printer, $"https://{printer.IPAddress}/live/api/v4/papercatalog");
+
+        /// <summary>
+        /// Retrieve a list of papercatalogs on the Fiery.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="id">Retrieve a particular papercatlog entry</param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryPrinterCatalog.PrinterCatalog PrinterCatalog(Printer printer, string id) =>
+            SendGetRequest<EFI_Fiery_API.FieryPrinterCatalog.PrinterCatalog>(printer, $"https://{printer.IPAddress}/live/api/v4/papercatalog/{id}");
 
 
         /// <summary>
@@ -336,7 +367,8 @@ namespace EFI
                         response = (T)Convert.ChangeType(new EFI_Fiery_API.FieryPrinterJobPreview()
                         {
                             PreviewBytes = bytes
-                        }, typeof(EFI_Fiery_API.FieryPrinterJobPreview));
+                        }, 
+                        typeof(EFI_Fiery_API.FieryPrinterJobPreview));
                     }
                 }
             });
@@ -408,9 +440,9 @@ namespace EFI
         /// </summary>
         /// <param name="httpResponseMessage"></param>
         /// <returns></returns>
-        private static string GetSessionID(HttpResponseMessage httpResponseMessage) => string.Join("", httpResponseMessage.Headers.Where(x => x.Key == "Set-Cookie")
-                                                                                                                           .Select(x => x.Value.First()
-                                                                                                                           .Split('=')[1]
-                                                                                                                           .Split(';').First()));    
+        private static string GetSessionID(HttpResponseMessage httpResponseMessage)
+        {
+            return string.Join("", httpResponseMessage.Headers.Where(x => x.Key == "Set-Cookie").Select(x => x.Value.First().Split('=')[1].Split(';').First()));
+        }
     }
 }
