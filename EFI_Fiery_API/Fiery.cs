@@ -6,12 +6,12 @@ using Newtonsoft.Json;
 using EbbsSoft.ExtensionHelpers.T_Helpers;
 using EbbsSoft.ExtensionHelpers.DateTimeHelpers;
 using System.Net;
+using System.Text;
 
 namespace EFI
 {
     public partial class Fiery
     {
-
         private Fiery(){}
 
         /// <summary>
@@ -51,51 +51,6 @@ namespace EFI
         }
 
         /// <summary>
-        /// Printer.
-        /// </summary>
-        public class Printer
-        {
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <value></value>
-            public string IPAddress {get;set;}
-            
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="ipAddress"></param>
-            public Printer(string ipAddress)
-            {
-                // Check if the ip address is valid.
-                if (IsValidIPAddress(ipAddress))
-                {
-                    this.IPAddress = ipAddress;
-                }
-                else
-                {
-                    throw new Exception("IP Address Not Valid");
-                }
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public Printer(){}
-
-            /// <summary>
-            /// Valid IP Address.
-            /// </summary>
-            /// <param name="ipAddress"></param>
-            /// <returns></returns>
-            private bool IsValidIPAddress(string ipAddress)
-            {
-                System.Net.IPAddress ip = System.Net.IPAddress.Parse(ipAddress);
-                return ip.ToString() == ipAddress;
-            }
-        }
-
-        /// <summary>
         /// Establishes authorized user access to the Fiery API features
         /// </summary>
         /// <param name="printer"></param>
@@ -105,20 +60,24 @@ namespace EFI
         public static EFI_Fiery_API.FieryLogin.Login Login(Printer printer, string username, string password)
         {
             // Apply Certificate.
-            Console.Write("{0}", IsCertificateValidationApplied.Value ? "Certificate Applied" : "Certificate Was Unable To Be Applied");
-
-            if (printer == null)
-            {
-                throw new ArgumentNullException(nameof(printer));
-            }
-
-            if (string.IsNullOrEmpty(username))
-            {
-                throw new ArgumentException("message", nameof(username));
-            }
-
+            Console.WriteLine("{0}", IsCertificateValidationApplied.Value ? "Certificate Applied" : "Certificate Was Unable To Be Applied");
             EFI_Fiery_API.FieryLogin.Login loginResponse = SendLoginRequest(printer, username, password).Result;
 
+            return loginResponse;
+        }
+
+        /// <summary>
+        /// Establishes authorized user access to the Fiery API features
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryLogin.Login Login(string ipAddress, string username, string password)
+        {
+            // Apply Certificate.
+            Console.WriteLine("{0}", IsCertificateValidationApplied.Value ? "Certificate Applied" : "Certificate Was Unable To Be Applied");
+            EFI_Fiery_API.FieryLogin.Login loginResponse = SendLoginRequest(new Printer(ipAddress), username, password).Result;
             return loginResponse;
         }
 
