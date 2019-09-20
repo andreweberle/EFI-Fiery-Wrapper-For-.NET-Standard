@@ -346,10 +346,12 @@ namespace EFI
         /// <returns></returns>
         public static EFI_Fiery_API.FieryJobs.PrinterJobs UpdatePrinterJob(Printer printer, EFI_Fiery_API.FieryJobs.PrinterJobs printerJobObjects)
         {
-            EFI_Fiery_API.FieryJobs.PrinterJobs printerJobs = new EFI_Fiery_API.FieryJobs.PrinterJobs();
-            printerJobs.Data = new EFI_Fiery_API.FieryJobs.Data()
+            EFI_Fiery_API.FieryJobs.PrinterJobs printerJobs = new EFI_Fiery_API.FieryJobs.PrinterJobs
             {
-                Items = new System.Collections.Generic.List<EFI_Fiery_API.FieryJobs.Item>() { }
+                Data = new EFI_Fiery_API.FieryJobs.Data()
+                {
+                    Items = new System.Collections.Generic.List<EFI_Fiery_API.FieryJobs.Item>() { }
+                }
             };
             foreach (EFI_Fiery_API.FieryJobs.Item printerJob in printerJobObjects.Data.Items)
             {
@@ -395,7 +397,7 @@ namespace EFI
                 });
                 Task.WaitAll(task);
             }
-            return printerJobs;
+            return printerJobs; 
         }
 
         /// <summary>
