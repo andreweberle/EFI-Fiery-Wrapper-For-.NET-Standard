@@ -6,6 +6,27 @@ namespace EFI_Fiery_API
 {
     public class FieryServer
     {
+        public enum MethodEnum
+        {
+            none,
+            restart,
+            reboot,
+            stop,
+            clear,
+            pause,
+            resume,
+            cancelprinting,
+            cancelripping
+        }
+
+        public enum ServicesEnum
+        {
+            none,
+            jobs,
+            accounting,
+            configuration
+        }
+
         public class PrinterServerStatus
         {
             [JsonProperty("time")]
@@ -31,6 +52,9 @@ namespace EFI_Fiery_API
         {
             [JsonProperty("fiery")]
             public string Fiery { get; set; }
+
+            [JsonProperty("started", NullValueHandling = NullValueHandling.Ignore)]
+            public bool? Started { get; set; }
         }
 
         public class Link

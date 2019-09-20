@@ -35,8 +35,24 @@ namespace EFI_Fiery_API
                 }
                 else
                 {
-                    double unixTimestamp = Convert.ToDouble(Convert.ToString(reader.Value).Split(':')[0]);
-                    return unixTimestamp.UnixToDateTime();
+                    try
+                    {
+                        double unixTimestamp = Convert.ToDouble(Convert.ToString(reader.Value).Split(':')[0]);
+                        return unixTimestamp.UnixToDateTime().Date;
+                    }
+                    catch
+                    {
+                        // Return Unix Time.
+                        if (Convert.ToDateTime(reader.Value) == DateTime.MinValue)
+                        {
+                            return new DateTime(1970, 01, 01, 00, 00, 00, System.DateTimeKind.Local);
+                        }
+                        else
+                        {
+                            double unixDateTime =  Convert.ToDateTime(reader.Value).DateTimeToUnix();
+                            return unixDateTime.UnixToDateTime().Date;
+                        }
+                    }
                 }
             }
 
@@ -80,7 +96,6 @@ namespace EFI_Fiery_API
             /// <param name="serializer"></param>
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => writer.WriteValue((string)value);
         }
-
 
         public class KbToMbConverter : JsonConverter
         {
@@ -136,7 +151,7 @@ namespace EFI_Fiery_API
             /// <returns></returns>
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
-                switch (Convert.ToString(reader.Value).ToLower())
+                switch (Convert.ToString(reader.Value).ToLower() ?? string.Empty)
                 {
                     case "true":
                         return true;
@@ -145,6 +160,8 @@ namespace EFI_Fiery_API
                     case "yes":
                         return true;
                     case "no":
+                        return false;
+                    case "":
                         return false;
                     default:
                         throw new Exception($"Unable To Convert To Boolean : {reader.Path} :: {objectType.ToString()} ::: {reader.Value.ToString()}");
@@ -159,7 +176,7 @@ namespace EFI_Fiery_API
             /// <param name="serializer"></param>
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
             {
-                writer.WriteValue((string)value);
+                writer.WriteValue(value);
             }
         }
 

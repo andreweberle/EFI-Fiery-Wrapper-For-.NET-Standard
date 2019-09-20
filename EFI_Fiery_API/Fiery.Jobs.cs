@@ -1,6 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using EbbsSoft.ExtensionHelpers.StringHelpers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Text;
 
 namespace EFI_Fiery_API
 {
@@ -27,6 +33,65 @@ namespace EFI_Fiery_API
             Full
         }
 
+        public class CreatePrinterJob
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            public int NumberOfCopies { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public string FilePath { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public byte[] FileAsByteArray { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="filePath"></param>
+            /// <param name="numberOfCopies"></param>
+            public CreatePrinterJob(string filePath, int numberOfCopies)
+            {
+                FilePath = filePath;
+                NumberOfCopies = numberOfCopies;
+
+                if (File.Exists(filePath))
+                {
+                    FileAsByteArray = GetPDFAsByteArray(FilePath);
+                }
+            }
+
+            /// <summary>
+            /// Get Bytes From PDF.
+            /// </summary>
+            /// <param name="filePath"></param>
+            /// <returns></returns>
+            private static byte[] GetPDFAsByteArray(string filePath)
+            {
+                byte[] buffer = new byte[16 * 2048];
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    int read;
+                    while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        ms.Write(buffer, 0, read);
+                    }
+                    return ms.ToArray();
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public CreatePrinterJob() { }
+        }
+
         public class PrinterJobs
         {
             [JsonProperty("time")]
@@ -34,6 +99,15 @@ namespace EFI_Fiery_API
 
             [JsonProperty("data")]
             public Data Data { get; set; }
+
+            /// <summary>
+            /// Override To Json String.
+            /// </summary>
+            /// <returns></returns>
+            public override string ToString()
+            {
+                return this.ToJson();
+            }
         }
 
         public class Data
@@ -92,9 +166,8 @@ namespace EFI_Fiery_API
             [JsonProperty("print status")]
             public string PrintStatus { get; set; }
 
-            [JsonConverter(typeof(FieryHelpers.UnixDateTimeConverter))]
             [JsonProperty("date")]
-            public DateTime Date { get; set; } 
+            public string Date { get; set; } 
 
             [JsonProperty("num pages")]
             public string NumberofPages { get; set; }
@@ -150,17 +223,20 @@ namespace EFI_Fiery_API
             [JsonProperty("fiery")]
             public string Fiery { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             [JsonProperty("duplex printed")]
-            public string DuplexPrinted { get; set; }
+            public bool DuplexPrinted { get; set; }
 
             [JsonProperty("authuser")]
             public string AuthorizedUser { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             [JsonProperty("held?")]
-            public string IsHeld { get; set; }
+            public bool IsHeld { get; set; }
 
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             [JsonProperty("has disk raster?")]
-            public string HasDiskRaster { get; set; }
+            public bool HasDiskRaster { get; set; }
 
             [JsonProperty("Notes1")]
             public string Notes3 { get; set; }
@@ -173,7 +249,6 @@ namespace EFI_Fiery_API
 
             [JsonProperty("logical printer")]
             public string LogicalPrinter { get; set; }
-
             public string EFDuplex { get; set; }
 
             [JsonConverter(typeof(EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter))]
@@ -186,19 +261,25 @@ namespace EFI_Fiery_API
             [JsonProperty("num copies")]
             public long NumberofCopies { get; set; }
 
-
-            public string EFAutoScaling { get; set; }
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
+            public bool EFAutoScaling { get; set; }
             public decimal EFBrightness { get; set; }
 
             [JsonProperty("EFColorMode")]
             public string EFColourMode { get; set; }
 
-            public string EFControlBar { get; set; }
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
+            public bool EFControlBar { get; set; }
             public string EFDFAProfile { get; set; }
-            public string EFImageAlign { get; set; }
+
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
+            public bool EFImageAlign { get; set; }
             public long EFImageBackX { get; set; }
             public long EFImageBackY { get; set; }
-            public string EFImageFlag { get; set; }
+
+            [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
+            public bool EFImageFlag { get; set; }
+
             public long EFImageFrontX { get; set; }
             public long EFImageFrontY { get; set; }
             public string EFImageUnit { get; set; }
@@ -217,8 +298,6 @@ namespace EFI_Fiery_API
 
             [JsonConverter(typeof(FieryHelpers.BooleanConverter))]
             public bool EFPadPrinting { get; set; }
-
-
             public string EFPageDelivery { get; set; }
 
             [JsonConverter(typeof(FieryHelpers.BooleanConverter))]

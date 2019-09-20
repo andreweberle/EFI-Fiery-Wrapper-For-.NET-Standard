@@ -7,6 +7,8 @@ using EbbsSoft.ExtensionHelpers.T_Helpers;
 using EbbsSoft.ExtensionHelpers.DateTimeHelpers;
 using System.Net;
 using System.Text;
+using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace EFI
 {
@@ -23,11 +25,6 @@ namespace EFI
         /// 
         /// </summary>
         public static readonly Lazy<bool> IsCertificateValidationApplied = new Lazy<bool>(ApplyServerCertificateValidation, true);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private object LockAsync { get; set; }
 
         /// <summary>
         /// https://developer.efi.com/
@@ -290,6 +287,142 @@ namespace EFI
         public static EFI_Fiery_API.FieryPrinterCatalog.PrinterCatalog PrinterCatalog(Printer printer, string id) =>
             SendGetRequest<EFI_Fiery_API.FieryPrinterCatalog.PrinterCatalog>(printer, $"https://{printer.IPAddress}/live/api/v4/papercatalog/{id}");
 
+        /// <summary>
+        /// Starts Fiery server. Only works for FS150 platform or later servers.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryServer.PrinterServerStatus PrinterServerStart(Printer printer) =>
+            SendPostRequest<EFI_Fiery_API.FieryServer.PrinterServerStatus>(printer, $"https://{printer.IPAddress}/live/api/v4/server/start");
+
+        /// <summary>
+        /// Stop Fiery server.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryServer.PrinterServerStatus PrinterServerStop(Printer printer) =>
+            SendPostRequest<EFI_Fiery_API.FieryServer.PrinterServerStatus>(printer, $"https://{printer.IPAddress}/live/api/v4/server/stop");
+
+        /// <summary>
+        /// Create Printer Job.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="printerJobObject"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryJobs.PrinterJobs CreatePrinterJob(Printer printer, EFI_Fiery_API.FieryJobs.CreatePrinterJob printerJobObject)
+        {
+            EFI_Fiery_API.FieryJobs.PrinterJobs printerJobs = null;
+            Task task = Task.Run(async () =>
+            {
+                string url = $"https://{printer.IPAddress}/live/api/v4/jobs";
+                using (HttpClientHandler httpClientHandler = new HttpClientHandler())
+                using (HttpClient httpClient = new HttpClient(httpClientHandler))
+                using (Stream fileStream = new FileStream(printerJobObject.FilePath, FileMode.Open))
+                {
+                    CookieContainer cookieContainer = new CookieContainer();
+                    cookieContainer.Add(SessionIDCookie);
+                    httpClientHandler.CookieContainer = cookieContainer;
+
+                    MultipartFormDataContent request = new MultipartFormDataContent
+                    {
+                        { new StreamContent(fileStream), "file", Path.GetFileName(printerJobObject.FilePath) },
+                        { new StringContent(printerJobObject.NumberOfCopies.ToString()), "attributes[num copies]" }
+                    };
+
+                    HttpResponseMessage response = await httpClient.PostAsync(url, request);
+                    string data = await response.Content.ReadAsStringAsync();
+                    printerJobs = Newtonsoft.Json.JsonConvert.DeserializeObject<EFI_Fiery_API.FieryJobs.PrinterJobs>(data);
+                }        
+            });
+            Task.WaitAll(task);
+            return printerJobs;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="printerJobObjects"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryJobs.PrinterJobs UpdatePrinterJob(Printer printer, EFI_Fiery_API.FieryJobs.PrinterJobs printerJobObjects)
+        {
+            EFI_Fiery_API.FieryJobs.PrinterJobs printerJobs = new EFI_Fiery_API.FieryJobs.PrinterJobs();
+            printerJobs.Data = new EFI_Fiery_API.FieryJobs.Data()
+            {
+                Items = new System.Collections.Generic.List<EFI_Fiery_API.FieryJobs.Item>() { }
+            };
+            foreach (EFI_Fiery_API.FieryJobs.Item printerJob in printerJobObjects.Data.Items)
+            {
+                Task task = Task.Run(async () =>
+                {
+                    string url = $"https://{printer.IPAddress}/live/api/v4/jobs/{printerJob.Id}";
+                    using (HttpClientHandler httpClientHandler = new HttpClientHandler())
+                    using (HttpClient httpClient = new HttpClient(httpClientHandler))
+                    using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Put, url))
+                    {
+                        CookieContainer cookieContainer = new CookieContainer();
+                        cookieContainer.Add(SessionIDCookie);
+                        httpClientHandler.CookieContainer = cookieContainer;
+
+                        JObject attributes = new JObject();
+
+                        foreach (System.Reflection.PropertyInfo propertyInfo in printerJob.GetType().GetProperties())
+                        {
+                            if (propertyInfo.CustomAttributes.Any(x => x.AttributeType.FullName == "Newtonsoft.Json.JsonPropertyAttribute"))
+                            {
+                                attributes[propertyInfo.CustomAttributes.Where(x => x.AttributeType.FullName == "Newtonsoft.Json.JsonPropertyAttribute")
+                                                                        .Select(x => x.ConstructorArguments.First())
+                                                                        .First().Value.ToString()] = (dynamic)propertyInfo.GetValue(printerJob) ?? default;
+                            }
+                            else
+                            {
+                                attributes[propertyInfo.Name] = (dynamic)propertyInfo.GetValue(printerJob) ?? default;
+                            }
+                        }
+
+
+                        JObject payload = new JObject
+                        {
+                            ["attributes"] = attributes
+                        };
+
+                        httpRequestMessage.Content = new StringContent(payload.ToString(), Encoding.UTF8, MEDIA_TYPE);
+                        HttpResponseMessage response = await httpClient.SendAsync(httpRequestMessage);
+                        string data = await response.Content.ReadAsStringAsync();
+                        EFI_Fiery_API.FieryJobs.PrinterJobs results = Newtonsoft.Json.JsonConvert.DeserializeObject<EFI_Fiery_API.FieryJobs.PrinterJobs>(data);
+                        printerJobs.Data.Items.Add(EFI.Fiery.PrinterJobs(printer, results.Data.Items[0].Id).Data.Items.First());
+                    }
+                });
+                Task.WaitAll(task);
+            }
+            return printerJobs;
+        }
+
+        /// <summary>
+        /// Delete a job from Fiery.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        public static System.Collections.Generic.Dictionary<string, bool> DeletePrinterJob(Printer printer, string jobId) =>
+            DeletePrinterJob(printer, new[] { jobId });
+
+        /// <summary>
+        /// Delete a job from Fiery.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <param name="jobIds"></param>
+        /// <returns></returns>
+        public static System.Collections.Generic.Dictionary<string, bool> DeletePrinterJob(Printer printer, string[] jobIds)
+        {
+            System.Collections.Generic.Dictionary<string, bool> keyValuePairs = new System.Collections.Generic.Dictionary<string, bool>();
+            foreach (var jobId in jobIds)
+            {
+                keyValuePairs.Add(jobId, SendDeleteRequest(printer, $"https://{printer.IPAddress}/live/api/v4/jobs/" + jobId));
+            }
+            return keyValuePairs;
+        }
+
 
         /// <summary>
         /// Send GET Request.
@@ -333,6 +466,64 @@ namespace EFI
             });
             Task.WaitAll(task);
             return response;
+        }
+
+        /// <summary>
+        /// Send POST Request.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="printer"></param>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        private static T SendPostRequest<T>(Printer printer, string url)
+        {
+            T response = Activator.CreateInstance<T>();
+
+            Task task = Task.Run(async () =>
+            {
+                using (HttpClientHandler httpClientHandler = new HttpClientHandler())
+                using (HttpClient httpClient = new HttpClient(httpClientHandler))
+                using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, url))
+                {
+                    CookieContainer cookieContainer = new CookieContainer();
+                    cookieContainer.Add(SessionIDCookie);
+                    httpClientHandler.CookieContainer = cookieContainer;
+
+                    HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                    string data = await httpResponseMessage.Content.ReadAsStringAsync();
+                    response = JsonConvert.DeserializeObject<T>(data);
+                }
+            });
+            Task.WaitAll(task);
+            return response;
+        }
+
+        /// <summary>
+        /// Send DELETE Request.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="printer"></param>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        private static bool SendDeleteRequest(Printer printer, string url)
+        {
+            bool results = false;
+            Task task = Task.Run(async () =>
+            {
+                using (HttpClientHandler httpClientHandler = new HttpClientHandler())
+                using (HttpClient httpClient = new HttpClient(httpClientHandler))
+                using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Delete, url))
+                {
+                    CookieContainer cookieContainer = new CookieContainer();
+                    cookieContainer.Add(SessionIDCookie);
+                    httpClientHandler.CookieContainer = cookieContainer;
+
+                    HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                    results = httpResponseMessage.IsSuccessStatusCode;
+                }
+            });
+            Task.WaitAll(task);
+            return results;
         }
 
         /// <summary>
