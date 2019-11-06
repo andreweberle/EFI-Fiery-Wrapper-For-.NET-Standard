@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using EbbsSoft.ExtensionHelpers.T_Helpers;
+using EbbsSoft.ExtensionHelpers.GenericHelpers;
 using EbbsSoft.ExtensionHelpers.DateTimeHelpers;
 using System.Net;
 using System.Text;
@@ -339,7 +339,7 @@ namespace EFI
         }
 
         /// <summary>
-        /// 
+        /// Update Printer Job.
         /// </summary>
         /// <param name="printer"></param>
         /// <param name="printerJobObjects"></param>
@@ -424,7 +424,6 @@ namespace EFI
             }
             return keyValuePairs;
         }
-
 
         /// <summary>
         /// Send GET Request.
@@ -594,7 +593,12 @@ namespace EFI
         /// <returns></returns>
         private static string GetSessionID(HttpResponseMessage httpResponseMessage)
         {
-            return string.Join("", httpResponseMessage.Headers.Where(x => x.Key == "Set-Cookie").Select(x => x.Value.First().Split('=')[1].Split(';').First()));
+            return string.Join("", httpResponseMessage.Headers.Where(x => x.Key == "Set-Cookie")
+                                                              .Select(x => x.Value
+                                                              .First()
+                                                              .Split('=')[1]
+                                                              .Split(';')
+                                                              .First()));
         }
     }
 }
