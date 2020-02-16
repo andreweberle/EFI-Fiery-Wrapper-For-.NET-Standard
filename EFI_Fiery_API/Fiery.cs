@@ -21,10 +21,12 @@ namespace EFI
         /// </summary>
         private const string MEDIA_TYPE = "application/json";
 
+        private static HttpClient HttpClient { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
-        public static readonly Lazy<bool> IsCertificateValidationApplied = new Lazy<bool>(ApplyServerCertificateValidation, true);
+        public static readonly Lazy<HttpClientHandler> HttpClientHandler = new Lazy<HttpClientHandler>(ApplyServerCertificateValidation, true);
 
         /// <summary>
         /// https://developer.efi.com/
@@ -41,10 +43,15 @@ namespace EFI
         /// 
         /// </summary>
         /// <returns></returns>
-        private static bool ApplyServerCertificateValidation()
+        private static HttpClientHandler ApplyServerCertificateValidation()
         {
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-            return true;
+            HttpClientHandler httpClientHandler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
+
+            HttpClient = new HttpClient(httpClientHandler);
+            return httpClientHandler;
         }
 
         /// <summary>
@@ -56,10 +63,8 @@ namespace EFI
         /// <returns></returns>
         public static EFI_Fiery_API.FieryLogin.Login Login(Printer printer, string username, string password)
         {
-            // Apply Certificate.
-            Console.WriteLine("{0}", IsCertificateValidationApplied.Value ? "Certificate Applied" : "Certificate Was Unable To Be Applied");
+            ApplyServerCertificateValidation();
             EFI_Fiery_API.FieryLogin.Login loginResponse = SendLoginRequest(printer, username, password).Result;
-
             return loginResponse;
         }
 
@@ -72,8 +77,7 @@ namespace EFI
         /// <returns></returns>
         public static EFI_Fiery_API.FieryLogin.Login Login(string ipAddress, string username, string password)
         {
-            // Apply Certificate.
-            Console.WriteLine("{0}", IsCertificateValidationApplied.Value ? "Certificate Applied" : "Certificate Was Unable To Be Applied");
+            ApplyServerCertificateValidation();
             EFI_Fiery_API.FieryLogin.Login loginResponse = SendLoginRequest(new Printer(ipAddress), username, password).Result;
             return loginResponse;
         }
@@ -89,10 +93,9 @@ namespace EFI
             Task task = Task.Run(async () =>
             {
                 string url = $"https://{printer.IPAddress}/live/api/v4/logout";
-                using (HttpClient httpClient = new HttpClient())
                 using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url))
                 {
-                    HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                    HttpResponseMessage httpResponseMessage = await HttpClient.SendAsync(httpRequestMessage);
                     if (httpResponseMessage.IsSuccessStatusCode)
                     {
                         SessionIDCookie = null;
@@ -315,13 +318,11 @@ namespace EFI
             Task task = Task.Run(async () =>
             {
                 string url = $"https://{printer.IPAddress}/live/api/v4/jobs";
-                using (HttpClientHandler httpClientHandler = new HttpClientHandler())
-                using (HttpClient httpClient = new HttpClient(httpClientHandler))
                 using (Stream fileStream = new FileStream(printerJobObject.FilePath, FileMode.Open))
                 {
                     CookieContainer cookieContainer = new CookieContainer();
                     cookieContainer.Add(SessionIDCookie);
-                    httpClientHandler.CookieContainer = cookieContainer;
+                    HttpClientHandler.Value.CookieContainer = cookieContainer;
 
                     MultipartFormDataContent request = new MultipartFormDataContent
                     {
@@ -329,7 +330,7 @@ namespace EFI
                         { new StringContent(printerJobObject.NumberOfCopies.ToString()), "attributes[num copies]" }
                     };
 
-                    HttpResponseMessage response = await httpClient.PostAsync(url, request);
+                    HttpResponseMessage response = await HttpClient.PostAsync(url, request);
                     string data = await response.Content.ReadAsStringAsync();
                     printerJobs = Newtonsoft.Json.JsonConvert.DeserializeObject<EFI_Fiery_API.FieryJobs.PrinterJobs>(data);
                 }        
@@ -358,13 +359,11 @@ namespace EFI
                 Task task = Task.Run(async () =>
                 {
                     string url = $"https://{printer.IPAddress}/live/api/v4/jobs/{printerJob.Id}";
-                    using (HttpClientHandler httpClientHandler = new HttpClientHandler())
-                    using (HttpClient httpClient = new HttpClient(httpClientHandler))
                     using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Put, url))
                     {
                         CookieContainer cookieContainer = new CookieContainer();
                         cookieContainer.Add(SessionIDCookie);
-                        httpClientHandler.CookieContainer = cookieContainer;
+                        HttpClientHandler.Value.CookieContainer = cookieContainer;
 
                         JObject attributes = new JObject();
 
@@ -389,7 +388,7 @@ namespace EFI
                         };
 
                         httpRequestMessage.Content = new StringContent(payload.ToString(), Encoding.UTF8, MEDIA_TYPE);
-                        HttpResponseMessage response = await httpClient.SendAsync(httpRequestMessage);
+                        HttpResponseMessage response = await HttpClient.SendAsync(httpRequestMessage);
                         string data = await response.Content.ReadAsStringAsync();
                         EFI_Fiery_API.FieryJobs.PrinterJobs results = Newtonsoft.Json.JsonConvert.DeserializeObject<EFI_Fiery_API.FieryJobs.PrinterJobs>(data);
                         printerJobs.Data.Items.Add(EFI.Fiery.PrinterJobs(printer, results.Data.Items[0].Id).Data.Items.First());
@@ -399,6 +398,13 @@ namespace EFI
             }
             return printerJobs; 
         }
+
+        /// <summary>
+        /// Lists the printer queues (logical printers) configured on the Fiery.
+        /// </summary>
+        /// <param name="printer"></param>
+        /// <returns></returns>
+        public static EFI_Fiery_API.FieryQueue GetPrinterQueue(Printer printer) => SendGetRequest<EFI_Fiery_API.FieryQueue>(printer, $"https://{printer.IPAddress}/live/api/v4/queues");
 
         /// <summary>
         /// Delete a job from Fiery.
@@ -438,15 +444,17 @@ namespace EFI
 
             Task task = Task.Run(async () =>
             {
-                using (HttpClientHandler httpClientHandler = new HttpClientHandler())
-                using (HttpClient httpClient = new HttpClient(httpClientHandler))
                 using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url))
                 {
                     CookieContainer cookieContainer = new CookieContainer();
                     cookieContainer.Add(SessionIDCookie);
-                    httpClientHandler.CookieContainer = cookieContainer;
 
-                    HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                    if (!HttpClientHandler.IsValueCreated)
+                    {
+                        HttpClientHandler.Value.CookieContainer = cookieContainer;
+                    }
+
+                    HttpResponseMessage httpResponseMessage = await HttpClient.SendAsync(httpRequestMessage);
 
                     if (response.GetType() != typeof(EFI_Fiery_API.FieryPrinterJobPreview))
                     {
@@ -482,15 +490,17 @@ namespace EFI
 
             Task task = Task.Run(async () =>
             {
-                using (HttpClientHandler httpClientHandler = new HttpClientHandler())
-                using (HttpClient httpClient = new HttpClient(httpClientHandler))
                 using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, url))
                 {
                     CookieContainer cookieContainer = new CookieContainer();
                     cookieContainer.Add(SessionIDCookie);
-                    httpClientHandler.CookieContainer = cookieContainer;
+                    
+                    if (!HttpClientHandler.IsValueCreated)
+                    {
+                        HttpClientHandler.Value.CookieContainer = cookieContainer;
+                    }
 
-                    HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                    HttpResponseMessage httpResponseMessage = await HttpClient.SendAsync(httpRequestMessage);
                     string data = await httpResponseMessage.Content.ReadAsStringAsync();
                     response = JsonConvert.DeserializeObject<T>(data);
                 }
@@ -511,15 +521,17 @@ namespace EFI
             bool results = false;
             Task task = Task.Run(async () =>
             {
-                using (HttpClientHandler httpClientHandler = new HttpClientHandler())
-                using (HttpClient httpClient = new HttpClient(httpClientHandler))
                 using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Delete, url))
                 {
                     CookieContainer cookieContainer = new CookieContainer();
                     cookieContainer.Add(SessionIDCookie);
-                    httpClientHandler.CookieContainer = cookieContainer;
 
-                    HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                    if (!HttpClientHandler.IsValueCreated)
+                    {
+                        HttpClientHandler.Value.CookieContainer = cookieContainer;
+                    }
+
+                    HttpResponseMessage httpResponseMessage = await HttpClient.SendAsync(httpRequestMessage);
                     results = httpResponseMessage.IsSuccessStatusCode;
                 }
             });
@@ -543,11 +555,11 @@ namespace EFI
                 try
                 {
                     string url = $"https://{printer.IPAddress}/live/api/v4/login";
-                    using (HttpClient httpClient = new HttpClient())
                     using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, url))
                     {
+                        string payload = new LoginRequest(username, password).ToString();
                         httpRequestMessage.Content = new StringContent(new LoginRequest(username, password).ToString(), System.Text.Encoding.UTF8, MEDIA_TYPE);
-                        HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                        HttpResponseMessage httpResponseMessage = await HttpClient.SendAsync(httpRequestMessage);
                         loginResponse = JsonConvert.DeserializeObject<EFI_Fiery_API.FieryLogin.Login>(await httpResponseMessage.Content.ReadAsStringAsync());
 
                         if (httpResponseMessage.IsSuccessStatusCode)
@@ -560,6 +572,7 @@ namespace EFI
                             loginResponse.IsSuccess = false;
                         }
                     }
+
                 }
                 catch (Exception ex)
                 {

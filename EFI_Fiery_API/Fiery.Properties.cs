@@ -2170,8 +2170,8 @@ namespace EFI_Fiery_API
             public float RightHWMargin { get; set; }
             public float TopHWMargin { get; set; }
             public object[] uneditablekeys { get; set; }
-            public int MaxMediaHeight { get; set; }
-            public int MaxMediaWidth { get; set; }
+            public string MaxMediaHeight { get; set; }
+            public string MaxMediaWidth { get; set; }
             public string command { get; set; }
         }
 

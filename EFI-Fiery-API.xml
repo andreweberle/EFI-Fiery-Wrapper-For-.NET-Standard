@@ -1,0 +1,526 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EFI-Fiery-API</name>
+    </assembly>
+    <members>
+        <member name="M:EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter.CanConvert(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="objectType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.UnixDateTimeConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.KbToGbConverter.CanConvert(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="objectType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.KbToGbConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.KbToGbConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.KbToMbConverter.CanConvert(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="objectType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.KbToMbConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.KbToMbConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.BooleanConverter.CanConvert(System.Type)">
+            <summary>
+            Can The Given Type Be Converted?
+            </summary>
+            <param name="objectType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.BooleanConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Read The Value.
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.BooleanConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Write The Value.
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.MinuteToDayConverter.CanConvert(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="objectType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.MinuteToDayConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryHelpers.MinuteToDayConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="P:EFI_Fiery_API.FieryJobs.CreatePrinterJob.NumberOfCopies">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:EFI_Fiery_API.FieryJobs.CreatePrinterJob.FilePath">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:EFI_Fiery_API.FieryJobs.CreatePrinterJob.FileAsByteArray">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryJobs.CreatePrinterJob.#ctor(System.String,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="filePath"></param>
+            <param name="numberOfCopies"></param>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryJobs.CreatePrinterJob.GetPDFAsByteArray(System.String)">
+            <summary>
+            Get Bytes From PDF.
+            </summary>
+            <param name="filePath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryJobs.CreatePrinterJob.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:EFI_Fiery_API.FieryJobs.PrinterJobs.ToString">
+            <summary>
+            Override To Json String.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:EFI_Fiery_API.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:EFI_Fiery_API.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:EFI_Fiery_API.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="F:EFI.Fiery.MEDIA_TYPE">
+            <summary>
+            Media Type For Rest Requests.
+            </summary>
+        </member>
+        <member name="F:EFI.Fiery.HttpClientHandler">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:EFI.Fiery.AccessKey">
+            <summary>
+            https://developer.efi.com/
+            </summary>
+            <value></value>
+        </member>
+        <member name="P:EFI.Fiery.SessionIDCookie">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:EFI.Fiery.ApplyServerCertificateValidation">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.Login(EFI.Fiery.Printer,System.String,System.String)">
+            <summary>
+            Establishes authorized user access to the Fiery API features
+            </summary>
+            <param name="printer"></param>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.Login(System.String,System.String,System.String)">
+            <summary>
+            Establishes authorized user access to the Fiery API features
+            </summary>
+            <param name="ipAddress"></param>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.Logout(EFI.Fiery.Printer)">
+            <summary>
+            Terminates an authorized session initialized by the "login" request
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterInformation(EFI.Fiery.Printer)">
+            <summary>
+            Returns Fiery's basic info, such as "name", "version", "disk_available", etc
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterStatus(EFI.Fiery.Printer)">
+            <summary>
+            Reports a string value indicating the current status of the Fiery software
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterDetail(EFI.Fiery.Printer)">
+            <summary>
+            Requests information about the Fiery (as returned #by "java.util.TimeZone.getAvailableIDs()". .
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterComsumables(EFI.Fiery.Printer)">
+            <summary>
+            Reports information about the supply of paper, tray, and toner on the print engine.
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterFeatures(EFI.Fiery.Printer)">
+            <summary>
+            Return Fiery's Support Feature options/keys
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterPrintPages(EFI.Fiery.Printer)">
+            <summary>
+            Lists printable system pages which can be output.
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterServerStatus(EFI.Fiery.Printer)">
+            <summary>
+            Reports a string value indicating the current status of the Fiery software
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterDevices(EFI.Fiery.Printer)">
+            <summary>
+            Returns information about the print device connected to the Fiery server and its currently printing/ripping jobs' progress.
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterJobs(EFI.Fiery.Printer)">
+            <summary>
+            Lists jobs in all queues on Fiery and their attributes
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterJobs(EFI.Fiery.Printer,System.String)">
+            <summary>
+            Returns job attributes of a job specified by id
+            </summary>
+            <param name="printer"></param>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterJobs(EFI.Fiery.Printer,EFI_Fiery_API.FieryJobs.JobState)">
+            <summary>
+            Retrieve jobs base on job states
+            </summary>
+            <param name="printer"></param>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterJobsPreview(EFI.Fiery.Printer,System.String,System.Int32)">
+            <summary>
+            Retrieve preview of the job
+            </summary>
+            <param name="printer"></param>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterJobsPreview(EFI.Fiery.Printer,System.String,System.Int32,EFI_Fiery_API.FieryJobs.PreviewState)">
+            <summary>
+            Retrieve preview of the job
+            </summary>
+            <param name="printer"></param>
+            <param name="jobId"></param>
+            <param name="pageNumber"></param>
+            <param name="previewState"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterAccounting(EFI.Fiery.Printer,System.Int32)">
+            <summary>
+            Lists data from the Fiery's job log, containing selected accounting information for each printed job.
+            </summary>
+            <param name="printer"></param>
+            <param name="count">100</param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterAccounting(EFI.Fiery.Printer,EFI_Fiery_API.FieryPrinterAccounting.DateTimePoint,System.DateTime)">
+            <summary>
+            Lists data from the Fiery's job log, containing selected accounting information for each printed job.
+            </summary>
+            <param name="printer"></param>
+            <param name="dateTimePoint">start_time, end_time</param>
+            <param name="dateTime">time range relative to present time.</param>
+            <returns>100 Items</returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterAccounting(EFI.Fiery.Printer)">
+            <summary>
+            Lists data from the Fiery's job log, containing selected accounting information for each printed job.
+            Last 60 Minutes.
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterPresets(EFI.Fiery.Printer)">
+            <summary>
+            Lists presets and their attributes
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterPresets(EFI.Fiery.Printer,System.String)">
+            <summary>
+            Lists presets and their attributes
+            </summary>
+            <param name="printer"></param>
+            <param name="id">preset's id.</param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterProperties(EFI.Fiery.Printer)">
+            <summary>
+            List of all the ppd, pdd, netcfg, dict.ppd, email.pdd keys, values.
+            </summary>
+            <param name="printer"></param>
+            <param name="id">preset's id.</param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterCatalog(EFI.Fiery.Printer)">
+            <summary>
+            Retrieve a list of papercatalogs on the Fiery.
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterCatalog(EFI.Fiery.Printer,System.String)">
+            <summary>
+            Retrieve a list of papercatalogs on the Fiery.
+            </summary>
+            <param name="printer"></param>
+            <param name="id">Retrieve a particular papercatlog entry</param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterServerStart(EFI.Fiery.Printer)">
+            <summary>
+            Starts Fiery server. Only works for FS150 platform or later servers.
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.PrinterServerStop(EFI.Fiery.Printer)">
+            <summary>
+            Stop Fiery server.
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.CreatePrinterJob(EFI.Fiery.Printer,EFI_Fiery_API.FieryJobs.CreatePrinterJob)">
+            <summary>
+            Create Printer Job.
+            </summary>
+            <param name="printer"></param>
+            <param name="printerJobObject"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.UpdatePrinterJob(EFI.Fiery.Printer,EFI_Fiery_API.FieryJobs.PrinterJobs)">
+            <summary>
+            Update Printer Job.
+            </summary>
+            <param name="printer"></param>
+            <param name="printerJobObjects"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.GetPrinterQueue(EFI.Fiery.Printer)">
+            <summary>
+            Lists the printer queues (logical printers) configured on the Fiery.
+            </summary>
+            <param name="printer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.DeletePrinterJob(EFI.Fiery.Printer,System.String)">
+            <summary>
+            Delete a job from Fiery.
+            </summary>
+            <param name="printer"></param>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.DeletePrinterJob(EFI.Fiery.Printer,System.String[])">
+            <summary>
+            Delete a job from Fiery.
+            </summary>
+            <param name="printer"></param>
+            <param name="jobIds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.SendGetRequest``1(EFI.Fiery.Printer,System.String)">
+            <summary>
+            Send GET Request.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="printer"></param>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.SendPostRequest``1(EFI.Fiery.Printer,System.String)">
+            <summary>
+            Send POST Request.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="printer"></param>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.SendDeleteRequest(EFI.Fiery.Printer,System.String)">
+            <summary>
+            Send DELETE Request.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="printer"></param>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.SendLoginRequest(EFI.Fiery.Printer,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="printer"></param>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Fiery.GetSessionID(System.Net.Http.HttpResponseMessage)">
+            <summary>
+            Get Session ID
+            </summary>
+            <param name="httpResponseMessage"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EFI.Fiery.Printer">
+            <summary>
+            Printer.
+            </summary>
+        </member>
+        <member name="P:EFI.Fiery.Printer.IPAddress">
+            <summary>
+            
+            </summary>
+            <value></value>
+        </member>
+        <member name="M:EFI.Fiery.Printer.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="ipAddress"></param>
+        </member>
+        <member name="M:EFI.Fiery.Printer.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:EFI.Fiery.Printer.IsValidIPAddress(System.String)">
+            <summary>
+            Valid IP Address.
+            </summary>
+            <param name="ipAddress"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

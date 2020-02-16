@@ -163,6 +163,10 @@ namespace EFI_Fiery_API
                         return false;
                     case "":
                         return false;
+                    case "1":
+                        return true;
+                    case "0":
+                        return false;
                     default:
                         throw new Exception($"Unable To Convert To Boolean : {reader.Path} :: {objectType.ToString()} ::: {reader.Value.ToString()}");
                 }
