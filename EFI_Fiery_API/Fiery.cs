@@ -3,12 +3,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using EbbsSoft.ExtensionHelpers.GenericHelpers;
-using EbbsSoft.ExtensionHelpers.DateTimeHelpers;
 using System.Net;
 using System.Text;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace EFI
 {
@@ -612,6 +611,54 @@ namespace EFI
                                                               .Split('=')[1]
                                                               .Split(';')
                                                               .First()));
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class Extenstions
+    {
+        /// <summary>
+        /// DateTime To Unix TimeStamp
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static Double DateTimeToUnix(this DateTime dateTime)
+        {
+            DateTime unixStart = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            long unixTimeStampInTicks = (dateTime.ToUniversalTime() - unixStart).Ticks;
+            return (double)unixTimeStampInTicks / TimeSpan.TicksPerSecond;
+        }
+
+        /// <summary>
+        /// Attempt To Read All Innter Exceptions From The Hierarchy
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <returns></returns>
+        public static IEnumerable<Exception> TryGetInnerExceptionsErrors(this Exception exception)
+        {
+            // Get The System Exception.
+            System.Exception ex = exception;
+
+            // Start Returning Each Exception To The Caller.
+            while (ex != null)
+            {
+                yield return ex;
+                ex = ex.InnerException;
+            }
+        }
+
+        /// <summary>
+        /// Unix TimeStamp To DateTime
+        /// </summary>
+        /// <param name="unixTimestamp"></param>
+        /// <returns></returns>
+        public static DateTime UnixToDateTime(this double unixTimestamp)
+        {
+            DateTime unixStart = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Local);
+            long unixTimeStampInTicks = (long)(unixTimestamp * TimeSpan.TicksPerSecond);
+            return new DateTime(unixStart.Ticks + unixTimeStampInTicks, System.DateTimeKind.Local);
         }
     }
 }

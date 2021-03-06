@@ -1,5 +1,4 @@
-﻿using EbbsSoft.ExtensionHelpers.StringHelpers;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
@@ -106,7 +105,7 @@ namespace EFI_Fiery_API
             /// <returns></returns>
             public override string ToString()
             {
-                return this.ToJson();
+                return Newtonsoft.Json.JsonConvert.SerializeObject(this);
             }
         }
 

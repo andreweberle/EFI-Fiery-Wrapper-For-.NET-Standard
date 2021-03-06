@@ -522,5 +522,31 @@
             <param name="ipAddress"></param>
             <returns></returns>
         </member>
+        <member name="T:EFI.Extenstions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:EFI.Extenstions.DateTimeToUnix(System.DateTime)">
+            <summary>
+            DateTime To Unix TimeStamp
+            </summary>
+            <param name="dateTime"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Extenstions.TryGetInnerExceptionsErrors(System.Exception)">
+            <summary>
+            Attempt To Read All Innter Exceptions From The Hierarchy
+            </summary>
+            <param name="exception"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EFI.Extenstions.UnixToDateTime(System.Double)">
+            <summary>
+            Unix TimeStamp To DateTime
+            </summary>
+            <param name="unixTimestamp"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>
